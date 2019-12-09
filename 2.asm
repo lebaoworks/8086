@@ -19,55 +19,102 @@ main:
         mov ah, 09h
         int 21h
     
-    ;use bx to store sumary
-    ;use cx to count numbers
-    and bx, 00h
-    and cx, 00h
-        
+    
+    
+    
+    ;____________________. <- 00h
+    ;                    |
+    ;                    |
+    ;                    |
+    ;                    |
+    ;                    |
+    ;                    |
+    ;____________________|
+    ;       SUMMARY      | <- FAh
+    ;____________________|
+    ;    NUMBERS COUNT   | (- FCh
+    ;____________________|
+    ;     TEMPORARY      | (- FEh
+    ;____________________|
+    
+    push 00h
+    push 00h
+    push 00h
+    mov bp, sp  ;bp = FAh
+    
+    ;use cx to check if count
+    xor cx, cx        
+    
     ;input numbers with ' ' seperator
-    input_number:
+    input_digit:
         mov ah, 01h
         int 21h
         
-        ;if input enter key -> stop input
-        cmp al, 0dh
-        jz calc_average
-        
-        ;if input space key -> next number
-        cmp al, ' '
-        jz input_number
-        
         ;if ord(character) < ord('0') -> not valid
         cmp al, '0'
-        jbe not_valid
+        jb non_digit
         
         ;if ord(character) > ord('9') -> not valid
         cmp al,'9'
-        jg not_valid
+        jg non_digit
         
-        ;add number to sumary, increase count
-        mov ah, 00h
-        sub ax, '0'
-        add bx, ax
-        inc cx
-        
-        ;read next character
-        jmp input_number
-        
-        ;print 
-        not_valid:
-            lea dx, message_not_valid
-            mov ah, 09h
-            int 21h
+        is_digit:
+            ;increase count
+            or cl, 1h
             
-            hlt
+            ;append to tail
+            sub al, '0'
+            xor ah, ah      ;ax = digit
+            mov bx, ax      ;save digit to bx
+            
+            mov ax, [bp+04h]    ;mov temp to ax
+            mov dx, 0ah
+            mul dx              ;temp *= 10
+            add ax, bx          ;temp += digit
+            mov [bp+04h], ax    ;save temp
+                    
+            ;next character
+            jmp input_digit
+        
+        non_digit:
+            ;previous is not a digit
+            test cl,cl
+            je indentify_seperator
+           
+            ;count, sum
+            add [bp+02h], 1h
+            mov bx, [bp+04h]
+            add [bp], bx
+            
+            ;clear temp
+            mov [bp+04h], 00h
+            xor cx, cx
+            
+            indentify_seperator:
+            
+                ;if input enter key -> stop input
+                cmp al, 0dh
+                jz calc_average
+        
+                ;if input space key -> next number
+                cmp al, ' '
+                jz input_digit
+        
+                ;not valid character
+                lea dx, message_not_valid
+                mov ah, 09h
+                int 21h
+                hlt
     
     ;calculate average
     calc_average:
-        mov ax, bx
+        pop ax  ;get sumary
+        pop cx  ;get count
+        pop bx  ;remove temp
+        
         div cl
         
-        xor ah, ah
+        xor ah, ah  ;clear remainer
 
     output_result:
         ;initalize

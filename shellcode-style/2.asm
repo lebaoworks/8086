@@ -94,8 +94,8 @@ main:
             add [bp], bx
             
             ;clear temp
-            mov [bp+04h], 00h
             xor cx, cx
+            mov [bp+04h], cx
             
             indentify_seperator:
             
@@ -136,9 +136,7 @@ main:
         pop cx  ;get count
         pop bx  ;remove temp
         
-        div cl
-        
-        xor ah, ah  ;clear remainer
+        div cx
 
     output_result:
         ;initalize

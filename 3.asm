@@ -38,7 +38,7 @@ main:
             
             ;if ord(character) < ord('0') -> not valid
             cmp al, '0'
-            je not_valid
+            jb not_valid
             
             ;if ord(character) > ord('9') -> not valid
             cmp al,'9'

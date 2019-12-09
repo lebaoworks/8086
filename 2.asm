@@ -5,7 +5,7 @@ name "calc-average-bao"
 
 
 .data
-    message_input db 'Input numbers ( 0<=x<=9 ): ', '$'
+    message_input db 'Input numbers ( 0<=x<=500 ): ', '$'
     message_not_valid db 0dh, 0ah, 'Input is not valid!', '$'
     message_average db 0dh, 0ah, 'Average: ','$'
        
@@ -87,8 +87,8 @@ main:
             add [bp], bx
             
             ;clear temp
-            mov [bp+04h], 00h
             xor cx, cx
+            mov [bp+04h], cx
             
             indentify_seperator:
             
@@ -112,9 +112,7 @@ main:
         pop cx  ;get count
         pop bx  ;remove temp
         
-        div cl
-        
-        xor ah, ah  ;clear remainer
+        div cx
 
     output_result:
         ;initalize

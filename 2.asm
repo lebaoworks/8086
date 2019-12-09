@@ -32,9 +32,9 @@ main:
     ;____________________|
     ;       SUMMARY      | <- FAh
     ;____________________|
-    ;    NUMBERS COUNT   | (- FCh
+    ;    NUMBERS COUNT   | <- FCh
     ;____________________|
-    ;     TEMPORARY      | (- FEh
+    ;     TEMPORARY      | <- FEh
     ;____________________|
     
     push 00h
